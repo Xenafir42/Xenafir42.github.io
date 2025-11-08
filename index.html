@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zenehallgatási trendek 2018–2025</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      margin-bottom: 0.5rem;
+      font-size: 2.5rem;
+    }
+
+    p.subtitle {
+      font-size: 1.1rem;
+      color: #cce5ff;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    section {
+      margin-bottom: 3rem;
+    }
+
+    h2 {
+      border-left: 5px solid #00bcd4;
+      padding-left: 10px;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+    }
+
+    canvas {
+      width: 100% !important;
+      max-width: 900px;
+      height: 400px !important;
+      margin: 0 auto;
+      display: block;
+    }
+
+    .chart-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+      padding: 1.5rem;
+      margin: 0 auto;
+      width: 80%;
+      transition: transform 0.3s ease;
+    }
+
+    .chart-card:hover {
+      transform: scale(1.02);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #ccc;
+      background: rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Zenehallgatási trendek 2018–2025</h1>
+    <p class="subtitle">Globális adatok a hallgatási szokásokról, műfajokról és platformokról</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>🎧 Átlagos hallgatási idő (óra / hét)</h2>
+      <p>Az elmúlt években folyamatosan nőtt az emberek által zenére fordított idő. A streaming szolgáltatások
+      térnyerése és a mobilplatformok elérhetősége meghatározó tényezők voltak a növekedésben.</p>
+      <canvas id="hoursChart"></canvas>
+    </section>
+
+    <section>
+      <h2>🎵 Műfajok aránya a streamingben</h2>
+      <p>A pop és a hip-hop továbbra is uralja a zenei piacot, miközben a latin és az afrobeats műfajok 
+      dinamikusan növekedtek az utóbbi években, új közönségeket szólítva meg világszerte.</p>
+      <canvas id="genreChart"></canvas>
+    </section>
+
+    <section>
+      <h2>📱 Zenehallgatási platformok részesedése (2025)</h2>
+      <p>A Spotify továbbra is piacvezető a streaming szolgáltatások között, miközben az Apple Music és 
+      a YouTube Music stabilan tartja pozícióját. Az ázsiai piacokon a Tencent Music egyre jelentősebb szereplő.</p>
+      <div class="chart-card">
+        <canvas id="platformChart"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Készült adatvizualizációs projektként — 2025
+  </footer>
+
+  <script>
+    // JSON adatok
+    const data = {
+      "years": [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+      "listeningHoursPerWeek": {
+        "globalAverage": [17.8, 18.6, 19.2, 20.0, 20.1, 20.3, 20.5, 20.7]
+      },
+      "genreShare": {
+        "Pop":       [35, 34, 33, 33, 32, 31, 31, 30],
+        "HipHop":    [18, 19, 20, 21, 21, 22, 22, 22],
+        "Rock":      [16, 15, 15, 14, 14, 13, 12, 12],
+        "Latin":     [8, 9, 10, 11, 12, 13, 14, 15],
+        "Afrobeats": [2, 3, 4, 5, 7, 8, 10, 11],
+        "Electronic":[10, 10, 9, 8, 7, 7, 6, 6],
+        "Other":     [11, 10, 9, 8, 7, 6, 5, 4]
+      },
+      "platformShare2025": {
+        "Spotify": 31.5,
+        "Apple Music": 16.2,
+        "YouTube Music": 14.8,
+        "Amazon Music": 12.1,
+        "Tencent Music": 8.9,
+        "Deezer": 3.7,
+        "Others": 12.8
+      }
+    };
+
+    // 1️⃣ Hallgatási idő diagram
+    new Chart(document.getElementById("hoursChart"), {
+      type: "line",
+      data: {
+        labels: data.years,
+        datasets: [{
+          label: "Átlagos hallgatási idő (óra/hét)",
+          data: data.listeningHoursPerWeek.globalAverage,
+          borderColor: "#00bcd4",
+          backgroundColor: "rgba(0, 188, 212, 0.3)",
+          tension: 0.3,
+          fill: true,
+          pointRadius: 5,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: "white" } }
+        },
+        scales: {
+          x: { ticks: { color: "white" } },
+          y: { ticks: { color: "white" } }
+        }
+      }
+    });
+
+    // 2️⃣ Műfajok aránya diagram
+    new Chart(document.getElementById("genreChart"), {
+      type: "bar",
+      data: {
+        labels: data.years,
+        datasets: Object.keys(data.genreShare).map(genre => ({
+          label: genre,
+          data: data.genreShare[genre],
+          backgroundColor: `hsl(${Math.random()*360}, 70%, 55%)`
+        }))
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { labels: { color: "white" } }
+        },
+        scales: {
+          x: { stacked: true, ticks: { color: "white" } },
+          y: { stacked: true, ticks: { color: "white" } }
+        }
+      }
+    });
+
+    // 3️⃣ Platformok diagram – esztétikus, éles verzió
+    const ctx = document.getElementById("platformChart").getContext("2d");
+    ctx.canvas.style.width = "100%";
+    ctx.canvas.style.height = "400px";
+    ctx.canvas.style.imageRendering = "crisp-edges";
+
+    new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: Object.keys(data.platformShare2025),
+        datasets: [{
+          data: Object.values(data.platformShare2025),
+          backgroundColor: [
+            "rgba(29, 185, 84, 0.9)",  // Spotify
+            "rgba(250, 36, 60, 0.9)",  // Apple
+            "rgba(255, 204, 0, 0.9)",  // YouTube
+            "rgba(0, 168, 232, 0.9)",  // Amazon
+            "rgba(170, 102, 204, 0.9)", // Tencent
+            "rgba(255, 136, 0, 0.9)",  // Deezer
+            "rgba(153, 153, 153, 0.9)"  // Others
+          ],
+          borderWidth: 3,
+          borderColor: "rgba(255, 255, 255, 0.1)",
+          hoverOffset: 25,
+          hoverBorderWidth: 4,
+          hoverBorderColor: "rgba(255, 255, 255, 0.5)"
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: "60%",
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { 
+              color: "white", 
+              font: { size: 14, family: "'Segoe UI', sans-serif" },
+              padding: 15,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: "rgba(0, 0, 0, 0.85)",
+            titleColor: "#fff",
+            bodyColor: "#fff",
+            bodyFont: { size: 14 },
+            titleFont: { size: 16 },
+            padding: 12,
+            borderColor: "rgba(255, 255, 255, 0.2)",
+            borderWidth: 1,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                let value = context.raw;
+                return ` ${context.label}: ${value}%`;
+              }
+            }
+          }
+        },
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 1000,
+          easing: 'easeOutQuart'
+        },
+        layout: {
+          padding: 20
+        },
+        elements: {
+          arc: {
+            borderRadius: 6
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
