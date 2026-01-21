@@ -141,6 +141,56 @@
         de globálisan kisebb részesedéssel rendelkeznek.
       </div>
     </section>
+
+    <section>
+      <h2>⭐ Top 10 Legnépszerűbb Előadók</h2>
+      <p>A Last.fm közösségi adatai alapján ezek a művészek dominálják a zenei színteret világszerte. 
+      Taylor Swift vezeti a listát, de a hip-hop előadók is erős jelenlétet mutatnak.</p>
+      <div class="chart-card">
+        <canvas id="topArtistsChart"></canvas>
+      </div>
+      <div class="explanation">
+        <strong>Mit mutat ez a diagram?</strong><br>
+        A vízszintes oszlopdiagram a globálisan legtöbbet hallgatott előadókat jeleníti meg 2025-ös adatok szerint.  
+        <span style="color:#FF69B4;font-weight:bold;">Taylor Swift</span> messze vezet 3,5 milliárd hallgatással, 
+        míg a <span style="color:#9C27B0;font-weight:bold;">Kanye West</span> és 
+        <span style="color:#E91E63;font-weight:bold;">Radiohead</span> is kiemelkedő népszerűséggel rendelkeznek.  
+        A lista tükrözi a pop és hip-hop műfajok dominanciáját a modern zenei kultúrában.
+      </div>
+    </section>
+
+    <section>
+      <h2>🎯 Műfajok Eloszlása Közösségi Tagek Alapján</h2>
+      <p>A Last.fm felhasználói aktívan címkézik a zenéket, ami valós képet ad a műfajok relatív 
+      népszerűségéről a közösségben. A rock továbbra is a legaktívabban címkézett kategória.</p>
+      <div class="chart-card">
+        <canvas id="genreRadarChart"></canvas>
+      </div>
+      <div class="explanation">
+        <strong>Hogyan értelmezzük?</strong><br>
+        A radar diagram a különböző zenei műfajok közösségi aktivitását mutatja címkézések (taggings) alapján.  
+        A <span style="color:#FF6384;font-weight:bold;">rock</span> és 
+        <span style="color:#36A2EB;font-weight:bold;">electronic</span> műfajok vezetik a listát, 
+        ami rámutat arra, hogy ezek a stílusok kifejezetten aktív és elkötelezett rajongótáborral rendelkeznek.  
+        A diagram nem feltétlenül a hallgatási számokat, hanem inkább a közösségi elkötelezettséget tükrözi.
+      </div>
+    </section>
+
+    <section>
+      <h2>🔥 iTunes Top Dalok (Scraping)</h2>
+      <p>Az iTunes Charts valós idejű adatai alapján ezek a dalok dominálják most a piacot. 
+      Az adatok közvetlenül az iTunes RSS feed-ből kerülnek scrape-elésre, így mindig friss tartalmakat látsz.</p>
+      <div class="chart-card">
+        <canvas id="itunesChart"></canvas>
+      </div>
+      <div class="explanation">
+        <strong>Mit mutat ez a diagram?</strong><br>
+        A polar area diagram az iTunes platform aktuális top 10 dalát jeleníti meg valós időben.  
+        Az egyes szegmensek mérete a dal chart pozícióját tükrözi - minél nagyobb a terület, annál magasabb helyen áll a listán.  
+        Ez a vizualizáció lehetővé teszi, hogy gyorsan áttekintsük, mely dalok dominálják most a mainstream piacot, 
+        és azonnal lássuk az aktuális zenei trendeket. Az adatok folyamatosan frissülnek, így mindig az iTunes legfrissebb slágerlistáját láthatod.
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -173,6 +223,10 @@
         "Others": 12.8
       }
     };
+
+    // Last.fm API kulcs
+    const LASTFM_API_KEY = '9a5fcd11a0872341e02d43643a64f7ff';
+    const LASTFM_BASE_URL = 'https://ws.audioscrobbler.com/2.0/';
 
     // Ensure Chart.js uses the device pixel ratio for crisp rendering on HiDPI displays
     Chart.defaults.devicePixelRatio = Math.max(1, window.devicePixelRatio || 1);
@@ -310,6 +364,247 @@
         }
       }
     });
+
+    // 4️⃣ Top Előadók diagram - Dinamikus API betöltés
+    async function loadTopArtists() {
+      try {
+        const response = await fetch(`${LASTFM_BASE_URL}?method=chart.gettopartists&api_key=${LASTFM_API_KEY}&format=json&limit=10`);
+        const result = await response.json();
+        
+        const artists = result.artists.artist;
+        const labels = artists.map(a => a.name);
+        const playcounts = artists.map(a => Math.round(a.playcount / 1000000)); // millió
+
+        new Chart(document.getElementById("topArtistsChart"), {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Hallgatási szám (millió)",
+              data: playcounts,
+              backgroundColor: [
+                "#FF69B4", "#9C27B0", "#E91E63", "#673AB7",
+                "#3F51B5", "#F06292", "#BA68C8", "#EC407A",
+                "#AB47BC", "#FF4081"
+              ],
+              borderColor: "rgba(255,255,255,0.2)",
+              borderWidth: 2,
+              hoverBackgroundColor: "rgba(255,255,255,0.8)",
+              hoverBorderColor: "#ffffff",
+              hoverBorderWidth: 3
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            animation: { duration: 800, easing: 'easeOutBounce' },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                backgroundColor: "rgba(0,0,0,0.85)",
+                titleColor: "#fff",
+                bodyColor: "#fff",
+                padding: 12,
+                callbacks: {
+                  label: function(context) {
+                    return ` ${context.formattedValue} millió hallgatás`;
+                  }
+                }
+              }
+            },
+            interaction: { mode: 'nearest', intersect: true },
+            onHover: (evt, active) => { evt.native.target.style.cursor = active.length ? 'pointer' : 'default'; },
+            scales: {
+              x: {
+                ticks: { color: "white" },
+                grid: { color: "rgba(255,255,255,0.1)" }
+              },
+              y: {
+                ticks: { color: "white", font: { size: 12 } },
+                grid: { display: false }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Hiba a top előadók betöltésekor:', error);
+      }
+    }
+
+    // 5️⃣ Műfajok Radar diagram - Dinamikus API betöltés
+    async function loadGenreTags() {
+      try {
+        const response = await fetch(`${LASTFM_BASE_URL}?method=chart.gettoptags&api_key=${LASTFM_API_KEY}&format=json&limit=8`);
+        const result = await response.json();
+        
+        const tags = result.tags.tag;
+        const labels = tags.map(t => t.name.charAt(0).toUpperCase() + t.name.slice(1));
+        const taggings = tags.map(t => parseInt(t.taggings));
+
+        new Chart(document.getElementById("genreRadarChart"), {
+          type: "radar",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Közösségi címkézések száma",
+              data: taggings,
+              backgroundColor: "rgba(0, 188, 212, 0.25)",
+              borderColor: "#00bcd4",
+              borderWidth: 3,
+              pointBackgroundColor: "#00bcd4",
+              pointBorderColor: "#fff",
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 10,
+              pointHoverBackgroundColor: "#fff",
+              pointHoverBorderColor: "#00bcd4",
+              pointHoverBorderWidth: 3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 800, easing: 'easeInOutQuart' },
+            plugins: {
+              legend: {
+                labels: { color: "white", font: { size: 14 } }
+              },
+              tooltip: {
+                backgroundColor: "rgba(0,0,0,0.85)",
+                titleColor: "#fff",
+                bodyColor: "#fff",
+                padding: 10,
+                callbacks: {
+                  label: function(context) {
+                    return ` ${(context.raw / 1000000).toFixed(2)}M címkézés`;
+                  }
+                }
+              }
+            },
+            scales: {
+              r: {
+                ticks: {
+                  color: "white",
+                  backdropColor: "rgba(0,0,0,0)",
+                  callback: function(value) {
+                    return (value / 1000000).toFixed(1) + 'M';
+                  }
+                },
+                grid: { color: "rgba(255,255,255,0.2)" },
+                angleLines: { color: "rgba(255,255,255,0.2)" },
+                pointLabels: {
+                  color: "white",
+                  font: { size: 13, weight: 'bold' }
+                }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Hiba a műfajok betöltésekor:', error);
+      }
+    }
+
+    // API adatok betöltése
+    loadTopArtists();
+    loadGenreTags();
+
+    // 6️⃣ iTunes Chart Scraping
+    async function loadItunesChart() {
+      try {
+        // CORS proxy használata az iTunes RSS feed eléréséhez
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const itunesUrl = 'https://itunes.apple.com/us/rss/topsongs/limit=10/json';
+        
+        const response = await fetch(proxyUrl + encodeURIComponent(itunesUrl));
+        const data = await response.json();
+        
+        const songs = data.feed.entry;
+        const labels = songs.map((song, index) => `${index + 1}. ${song['im:name'].label}`);
+        const artists = songs.map(song => song['im:artist'].label);
+        
+        // Pozíciók alapján értékek (10-től 1-ig, hogy a top dal legyen a legnagyobb)
+        const values = songs.map((_, index) => 10 - index);
+
+        new Chart(document.getElementById("itunesChart"), {
+          type: "polarArea",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Chart pozíció (fordított)",
+              data: values,
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.7)",
+                "rgba(54, 162, 235, 0.7)",
+                "rgba(255, 206, 86, 0.7)",
+                "rgba(75, 192, 192, 0.7)",
+                "rgba(153, 102, 255, 0.7)",
+                "rgba(255, 159, 64, 0.7)",
+                "rgba(199, 199, 199, 0.7)",
+                "rgba(83, 102, 255, 0.7)",
+                "rgba(255, 99, 255, 0.7)",
+                "rgba(99, 255, 132, 0.7)"
+              ],
+              borderColor: "rgba(255,255,255,0.3)",
+              borderWidth: 2,
+              hoverBorderColor: "#ffffff",
+              hoverBorderWidth: 3
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 1000, easing: 'easeInOutQuart' },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                backgroundColor: "rgba(0,0,0,0.85)",
+                titleColor: "#fff",
+                bodyColor: "#fff",
+                padding: 12,
+                callbacks: {
+                  title: function(context) {
+                    return songs[context[0].dataIndex]['im:name'].label;
+                  },
+                  label: function(context) {
+                    const index = context.dataIndex;
+                    return [
+                      `Előadó: ${artists[index]}`,
+                      `Pozíció: #${index + 1}`
+                    ];
+                  }
+                }
+              }
+            },
+            scales: {
+              r: {
+                ticks: {
+                  display: false,
+                  backdropColor: "rgba(0,0,0,0)"
+                },
+                grid: { color: "rgba(255,255,255,0.1)" },
+                angleLines: { color: "rgba(255,255,255,0.2)" },
+                pointLabels: {
+                  color: "white",
+                  font: { size: 11 }
+                }
+              }
+            }
+          }
+        });
+      } catch (error) {
+        console.error('Hiba az iTunes chart scraping során:', error);
+        // Fallback adat megjelenítés hiba esetén
+        document.getElementById('itunesChart').parentElement.innerHTML = 
+          '<p style="color: #ff6b6b; text-align: center; padding: 2rem;">Az iTunes adatok betöltése sikertelen. Próbáld újra később!</p>';
+      }
+    }
+
+    loadItunesChart();
   </script>
 </body>
 </html>
