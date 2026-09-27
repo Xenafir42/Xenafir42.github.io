@@ -86,6 +86,15 @@
             border: 1px solid #cbd5e1;
 
             z-index: 2;
+
+            cursor: pointer;
+
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .class:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
         }
 
         .class-name {
@@ -131,7 +140,140 @@
             border-left: 5px solid #9333ea;
         }
 
+
+        /* =========================
+           MODAL
+           ========================= */
+
+        .modal {
+            display: none;
+
+            position: fixed;
+
+            z-index: 1000;
+
+            left: 0;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0, 0, 0, 0.5);
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+
+            width: 100%;
+            max-width: 550px;
+
+            padding: 25px;
+
+            border-radius: 10px;
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+            position: relative;
+
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+
+            right: 15px;
+            top: 10px;
+
+            width: 35px;
+            height: 35px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
+            font-weight: bold;
+
+            cursor: pointer;
+
+            color: #64748b;
+
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: #f1f5f9;
+            color: #111827;
+        }
+
+        .modal-title {
+            margin: 0 45px 25px 0;
+
+            font-size: 22px;
+
+            color: #111827;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section strong {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 14px;
+
+            color: #334155;
+        }
+
+        .modal-comment {
+            color: #475569;
+
+            line-height: 1.5;
+
+            white-space: pre-wrap;
+
+            background: #f8fafc;
+
+            padding: 12px;
+
+            border-radius: 6px;
+
+            min-height: 20px;
+        }
+
+        .modal-url {
+            color: #2563eb;
+
+            word-break: break-all;
+
+            text-decoration: none;
+        }
+
+        .modal-url:hover {
+            text-decoration: underline;
+        }
+
+        .modal-no-data {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+
         @media (max-width: 800px) {
+
             body {
                 padding: 10px;
             }
@@ -143,9 +285,14 @@
             .timetable-container {
                 overflow-x: auto;
             }
+
+            .modal-content {
+                padding: 20px;
+            }
         }
     </style>
 </head>
+
 
 <body>
 
@@ -158,7 +305,58 @@
     </div>
 
 
+    <!-- =========================
+         MODAL
+         ========================= -->
+
+    <div id="classModal" class="modal">
+
+        <div class="modal-content">
+
+            <span id="modalClose" class="modal-close">&times;</span>
+
+            <h2 id="modalTitle" class="modal-title">
+                Class
+            </h2>
+
+
+            <div class="modal-section">
+
+                <strong>Comment:</strong>
+
+                <div id="modalComment" class="modal-comment">
+                </div>
+
+            </div>
+
+
+            <div class="modal-section">
+
+                <strong>URL:</strong>
+
+                <a
+                    id="modalUrl"
+                    class="modal-url"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!--
+        FONTOS:
+        A valami.js tartalmazza a timetable tömböt,
+        ezért ezt az inline script előtt töltjük be.
+    -->
+
     <script src="valami.js"></script>
+
 
     <script>
 
@@ -170,6 +368,7 @@
             "Friday"
         ];
 
+
         const timeSlots = [
             ["08:00", "10:00"],
             ["10:00", "12:00"],
@@ -179,223 +378,591 @@
             ["18:00", "20:00"]
         ];
 
-        const timetableElement = document.getElementById("timetable");
+
+        const timetableElement =
+            document.getElementById("timetable");
 
 
-        /* Header */
+        /* =========================
+           MODAL ELEMENTS
+           ========================= */
 
-        const timeHeader = document.createElement("div");
+        const modal =
+            document.getElementById("classModal");
 
-        timeHeader.className = "header";
-        timeHeader.textContent = "Time";
+        const modalClose =
+            document.getElementById("modalClose");
 
-        timeHeader.style.gridColumn = "1";
-        timeHeader.style.gridRow = "1";
+        const modalTitle =
+            document.getElementById("modalTitle");
 
-        timetableElement.appendChild(timeHeader);
+        const modalComment =
+            document.getElementById("modalComment");
+
+        const modalUrl =
+            document.getElementById("modalUrl");
+
+
+        /* =========================
+           OPEN MODAL
+           ========================= */
+
+        function openClassModal(item) {
+
+            /*
+             * Title
+             */
+
+            modalTitle.textContent =
+                item.name || "Class";
+
+
+            /*
+             * Comment
+             */
+
+            if (
+                item.comment &&
+                item.comment.trim() !== ""
+            ) {
+
+                modalComment.textContent =
+                    item.comment.trim();
+
+                modalComment.classList.remove(
+                    "modal-no-data"
+                );
+
+            } else {
+
+                modalComment.textContent =
+                    "No comment available.";
+
+                modalComment.classList.add(
+                    "modal-no-data"
+                );
+
+            }
+
+
+            /*
+             * URL
+             *
+             * A te objektumaidban a mező neve:
+             *
+             * location_url
+             */
+
+            if (
+                item.location_url &&
+                item.location_url.trim() !== ""
+            ) {
+
+                modalUrl.textContent =
+                    item.location_url.trim();
+
+                modalUrl.href =
+                    item.location_url.trim();
+
+                modalUrl.style.display =
+                    "inline";
+
+            } else {
+
+                modalUrl.textContent =
+                    "No URL available.";
+
+                modalUrl.removeAttribute("href");
+
+                modalUrl.style.display =
+                    "inline";
+
+            }
+
+
+            /*
+             * Show modal
+             */
+
+            modal.classList.add("show");
+
+        }
+
+
+        /* =========================
+           CLOSE MODAL
+           ========================= */
+
+        function closeClassModal() {
+
+            modal.classList.remove("show");
+
+        }
+
+
+        /*
+         * Close button
+         */
+
+        modalClose.addEventListener(
+            "click",
+            closeClassModal
+        );
+
+
+        /*
+         * Click outside modal
+         */
+
+        modal.addEventListener(
+            "click",
+            function (event) {
+
+                if (event.target === modal) {
+
+                    closeClassModal();
+
+                }
+
+            }
+        );
+
+
+        /*
+         * ESC key
+         */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (event.key === "Escape") {
+
+                    closeClassModal();
+
+                }
+
+            }
+        );
+
+
+        /* =========================
+           HEADER
+           ========================= */
+
+        const timeHeader =
+            document.createElement("div");
+
+        timeHeader.className =
+            "header";
+
+        timeHeader.textContent =
+            "Time";
+
+        timeHeader.style.gridColumn =
+            "1";
+
+        timeHeader.style.gridRow =
+            "1";
+
+        timetableElement.appendChild(
+            timeHeader
+        );
 
 
         days.forEach((day, index) => {
 
-            const header = document.createElement("div");
+            const header =
+                document.createElement("div");
 
-            header.className = "header";
-            header.textContent = day;
+            header.className =
+                "header";
 
-            header.style.gridColumn = index + 2;
-            header.style.gridRow = 1;
+            header.textContent =
+                day;
 
-            timetableElement.appendChild(header);
+            header.style.gridColumn =
+                index + 2;
 
-        });
+            header.style.gridRow =
+                "1";
 
-
-        /* Empty cells + time labels */
-
-        timeSlots.forEach((slot, rowIndex) => {
-
-            const row = rowIndex + 2;
-
-            /* Time */
-
-            const time = document.createElement("div");
-
-            time.className = "time";
-            time.textContent = `${slot[0]}–${slot[1]}`;
-
-            time.style.gridColumn = 1;
-            time.style.gridRow = row;
-
-            timetableElement.appendChild(time);
-
-
-            /* Empty cells */
-
-            days.forEach((day, dayIndex) => {
-
-                const cell = document.createElement("div");
-
-                cell.className = "cell";
-
-                cell.style.gridColumn = dayIndex + 2;
-                cell.style.gridRow = row;
-
-                timetableElement.appendChild(cell);
-
-            });
+            timetableElement.appendChild(
+                header
+            );
 
         });
 
 
-        /* Convert time to minutes */
+        /* =========================
+           EMPTY CELLS + TIME LABELS
+           ========================= */
+
+        timeSlots.forEach(
+            (slot, rowIndex) => {
+
+                const row =
+                    rowIndex + 2;
+
+
+                /*
+                 * Time
+                 */
+
+                const time =
+                    document.createElement("div");
+
+                time.className =
+                    "time";
+
+                time.textContent =
+                    `${slot[0]}–${slot[1]}`;
+
+                time.style.gridColumn =
+                    "1";
+
+                time.style.gridRow =
+                    row;
+
+                timetableElement.appendChild(
+                    time
+                );
+
+
+                /*
+                 * Empty cells
+                 */
+
+                days.forEach(
+                    (day, dayIndex) => {
+
+                        const cell =
+                            document.createElement(
+                                "div"
+                            );
+
+                        cell.className =
+                            "cell";
+
+                        cell.style.gridColumn =
+                            dayIndex + 2;
+
+                        cell.style.gridRow =
+                            row;
+
+                        timetableElement.appendChild(
+                            cell
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =========================
+           CONVERT TIME TO MINUTES
+           ========================= */
 
         function toMinutes(time) {
 
-            const [hours, minutes] = time.split(":").map(Number);
+            const [
+                hours,
+                minutes
+            ] = time
+                .split(":")
+                .map(Number);
 
-            return hours * 60 + minutes;
+            return (
+                hours * 60 +
+                minutes
+            );
+
         }
 
 
-        /* Add classes */
+        /* =========================
+           ADD CLASSES
+           ========================= */
 
         timetable.forEach(item => {
 
-            const dayIndex = days.indexOf(item.time.day);
+            /*
+             * Safety check
+             */
 
-            if (dayIndex === -1) return;
+            if (
+                !item ||
+                !item.time
+            ) {
+                return;
+            }
 
 
-            const start = toMinutes(item.time.start);
-            const end = toMinutes(item.time.over);
+            /*
+             * Find day
+             */
+
+            const dayIndex =
+                days.indexOf(
+                    item.time.day
+                );
 
 
-            /* Find the starting 2-hour slot */
+            if (dayIndex === -1) {
+                return;
+            }
+
+
+            /*
+             * Start / end
+             */
+
+            const start =
+                toMinutes(
+                    item.time.start
+                );
+
+            const end =
+                toMinutes(
+                    item.time.over
+                );
+
+
+            /*
+             * Find starting 2-hour slot
+             */
 
             let slotIndex = -1;
 
-            timeSlots.forEach((slot, index) => {
 
-                const slotStart = toMinutes(slot[0]);
-                const slotEnd = toMinutes(slot[1]);
+            timeSlots.forEach(
+                (slot, index) => {
 
-                if (start >= slotStart && start < slotEnd) {
-                    slotIndex = index;
+                    const slotStart =
+                        toMinutes(
+                            slot[0]
+                        );
+
+                    const slotEnd =
+                        toMinutes(
+                            slot[1]
+                        );
+
+
+                    if (
+                        start >= slotStart &&
+                        start < slotEnd
+                    ) {
+
+                        slotIndex =
+                            index;
+
+                    }
+
                 }
-
-            });
-
-
-            if (slotIndex === -1) return;
+            );
 
 
-            /* How many 2-hour slots does the class use? */
-
-            const duration = end - start;
-
-            const rowSpan = Math.ceil(duration / 120);
+            if (slotIndex === -1) {
+                return;
+            }
 
 
-            /* Create class */
+            /*
+             * Duration
+             */
 
-            const classElement = document.createElement("div");
+            const duration =
+                end - start;
 
-            classElement.className = "class";
+
+            const rowSpan =
+                Math.max(
+                    1,
+                    Math.ceil(
+                        duration / 120
+                    )
+                );
 
 
-            /* Class type */
+            /*
+             * Create class
+             */
+
+            const classElement =
+                document.createElement(
+                    "div"
+                );
+
+            classElement.className =
+                "class";
+
+
+            /* =========================
+               CLASS TYPE
+               ========================= */
 
             if (item.type) {
 
-                const type = item.type
-                    .split(",")[0]
-                    .trim()
-                    .toLowerCase();
+                const type =
+                    item.type
+                        .split(",")[0]
+                        .trim()
+                        .toLowerCase();
+
 
                 if (
                     type === "course" ||
                     type === "seminar" ||
                     type === "laboratory"
                 ) {
-                    classElement.classList.add(type);
+
+                    classElement.classList.add(
+                        type
+                    );
+
                 } else {
-                    classElement.classList.add("default");
+
+                    classElement.classList.add(
+                        "default"
+                    );
+
                 }
 
             } else {
 
-                classElement.classList.add("default");
+                classElement.classList.add(
+                    "default"
+                );
 
             }
 
 
-            /* Name */
+            /* =========================
+               NAME
+               ========================= */
 
-            const name = document.createElement("div");
+            const name =
+                document.createElement(
+                    "div"
+                );
 
-            name.className = "class-name";
-            name.textContent = item.name;
+            name.className =
+                "class-name";
 
-            classElement.appendChild(name);
+            name.textContent =
+                item.name || "Unnamed class";
+
+            classElement.appendChild(
+                name
+            );
 
 
-            /* Type */
+            /* =========================
+               TYPE
+               ========================= */
 
             if (item.type) {
 
-                const type = document.createElement("div");
+                const type =
+                    document.createElement(
+                        "div"
+                    );
 
-                type.className = "class-type";
-                type.textContent = item.type;
+                type.className =
+                    "class-type";
 
-                classElement.appendChild(type);
+                type.textContent =
+                    item.type;
 
-            }
-
-
-            /* Location */
-
-            if (item.location && item.location.trim() !== "") {
-
-                const location = document.createElement("div");
-
-                location.className = "class-location";
-                location.textContent = item.location.trim();
-
-                classElement.appendChild(location);
+                classElement.appendChild(
+                    type
+                );
 
             }
 
 
-            /* Exact time */
+            /* =========================
+               LOCATION
+               ========================= */
 
-            const classTime = document.createElement("div");
+            if (
+                item.location &&
+                item.location.trim() !== ""
+            ) {
 
-            classTime.className = "class-time";
+                const location =
+                    document.createElement(
+                        "div"
+                    );
+
+                location.className =
+                    "class-location";
+
+                location.textContent =
+                    item.location.trim();
+
+                classElement.appendChild(
+                    location
+                );
+
+            }
+
+
+            /* =========================
+               EXACT TIME
+               ========================= */
+
+            const classTime =
+                document.createElement(
+                    "div"
+                );
+
+            classTime.className =
+                "class-time";
 
             classTime.textContent =
                 `${item.time.start}–${item.time.over}`;
 
-            classElement.appendChild(classTime);
+            classElement.appendChild(
+                classTime
+            );
 
 
-            /*
-             * Position
-             *
-             * Row 1 = header
-             * Row 2 = 08:00-10:00
-             * Row 3 = 10:00-12:00
-             * Row 4 = 12:00-14:00
-             * etc.
-             */
+            /* =========================
+               POSITION
+               ========================= */
 
-            classElement.style.gridColumn = dayIndex + 2;
+            classElement.style.gridColumn =
+                dayIndex + 2;
 
             classElement.style.gridRow =
                 `${slotIndex + 2} / span ${rowSpan}`;
 
 
-            timetableElement.appendChild(classElement);
+            /* =========================
+               CLICK EVENT
+               ========================= */
+
+            classElement.addEventListener(
+                "click",
+                function () {
+
+                    openClassModal(item);
+
+                }
+            );
+
+
+            /*
+             * Add class to timetable
+             */
+
+            timetableElement.appendChild(
+                classElement
+            );
 
         });
 
