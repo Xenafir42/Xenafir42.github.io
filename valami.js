@@ -74,7 +74,7 @@ const timetable = [
 
         location: "L.B.M",
 
-        location_url: "",
+        location_url: "https://maps.app.goo.gl/XVaAEC8NVxngbSV59",
 
         comment: "Miko garden, same building where the interview was, 2nd floor, small left door next to a big course room, right door?"
     },
