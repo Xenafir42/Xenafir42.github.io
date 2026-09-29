@@ -74,9 +74,9 @@ const timetable = [
 
         location: "L.B.M",
 
-        location_url: "https://maps.app.goo.gl/XVaAEC8NVxngbSV59",
+        location_url: "https://maps.app.goo.gl/1n9GuxrSEan3HKQS6",
 
-        comment: "Miko garden, same building where the interview was, 2nd floor, small left door next to a big course room, right door?"
+        comment: "Miko garden, little building left from the building, where the interview was, left classroom after the entrance"
     },
 
 
@@ -134,7 +134,7 @@ const timetable = [
 
         location: "335, FSEGA",
 
-        location_url: "",
+        location_url: "https://maps.app.goo.gl/CZd1FcB98KVw8x186",
 
         comment: ""
     },
@@ -214,9 +214,9 @@ const timetable = [
 
         location: "L.B.M",
 
-        location_url: "",
+        location_url: "https://maps.app.goo.gl/1n9GuxrSEan3HKQS6",
 
-        comment: ""
+        comment: "Miko garden, little building left from the building, where the interview was, left classroom after the entrance"
     },
 
 
@@ -254,7 +254,7 @@ const timetable = [
 
         location: "335, FSEGA",
 
-        location_url: "",
+        location_url: "https://maps.app.goo.gl/CZd1FcB98KVw8x186",
 
         comment: ""
     },
