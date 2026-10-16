@@ -25,14 +25,14 @@ const timetable = [
         name: "Command Line Scripting",
 
         time: {
-            day: "Tuesday",
+            day: "Monday",
             start: "18:00",
             over: "20:00"
         },
 
         type: "course",
 
-        location: "L.A.V",
+        location: "lab. Biophysics",
 
         location_url: "",
 
@@ -60,7 +60,7 @@ const timetable = [
     },
 
 
-    {
+    /*{
         id: "",
         name: "Cell and molecular biology",
 
@@ -77,7 +77,7 @@ const timetable = [
         location_url: "https://maps.app.goo.gl/1n9GuxrSEan3HKQS6",
 
         comment: "Miko garden, little building left from the building, where the interview was, left classroom after the entrance"
-    },
+    },*/
 
 
     {
@@ -86,8 +86,8 @@ const timetable = [
 
         time: {
             day: "Wednesday",
-            start: "08:00",
-            over: "10:00"
+            start: "10:00",
+            over: "12:00"
         },
 
         type: "course",
@@ -116,7 +116,7 @@ const timetable = [
 
         location_url: "https://maps.app.goo.gl/sopcXcY97QSzdKaN9",
 
-        comment: "Miko garden, 3 floor, left - right - left?, 1b entrance - rear building right entrance"
+        comment: "Miko garden, 1b entrance, 3rd floor"
     },
 
 
@@ -126,15 +126,15 @@ const timetable = [
 
         time: {
             day: "Wednesday",
-            start: "14:00",
-            over: "16:00"
+            start: "18:00",
+            over: "20:00"
         },
 
         type: "seminar",
 
-        location: "335, FSEGA",
+        location: "LFA",
 
-        location_url: "https://maps.app.goo.gl/CZd1FcB98KVw8x186",
+        location_url: "https://maps.app.goo.gl/7VaRp6RUC1DDV39W8",
 
         comment: ""
     },
@@ -152,15 +152,15 @@ const timetable = [
 
         type: "course",
 
-        location: "",
+        location: "LFA",
 
-        location_url: "",
+        location_url: "https://maps.app.goo.gl/7VaRp6RUC1DDV39W8",
 
         comment: ""
     },
 
 
-    {
+    /*{
         id: "",
         name: "Research Ethics",
 
@@ -177,7 +177,7 @@ const timetable = [
         location_url: "",
 
         comment: ""
-    },
+    },*/
 
 
     {
@@ -186,21 +186,21 @@ const timetable = [
 
         time: {
             day: "Thursday",
-            start: "16:00",
-            over: "18:00"
+            start: "10:00",
+            over: "12:00"
         },
 
         type: "course",
 
-        location: "",
+        location: "idk",
 
         location_url: "",
 
-        comment: ""
+        comment: "Mikó garden, 2nd floor"
     },
 
 
-    {
+    /*{
         id: "",
         name: "Genetics and molecular evolution",
 
@@ -217,10 +217,10 @@ const timetable = [
         location_url: "https://maps.app.goo.gl/1n9GuxrSEan3HKQS6",
 
         comment: "Miko garden, little building left from the building, where the interview was, left classroom after the entrance"
-    },
+    },*/
 
 
-    {
+    /*{
         id: "",
         name: "Molecular Biochemistry and Biophysics",
 
@@ -237,7 +237,7 @@ const timetable = [
         location_url: "",
 
         comment: ""
-    },
+    },*/
 
 
     {
@@ -245,38 +245,77 @@ const timetable = [
         name: "Computational Thinking",
 
         time: {
-            day: "Friday",
+            day: "Monday",
             start: "16:00",
             over: "18:00"
         },
 
         type: "course",
 
-        location: "335, FSEGA",
+        location: "310, FSEGA",
 
         location_url: "https://maps.app.goo.gl/CZd1FcB98KVw8x186",
 
         comment: ""
     },
 
+    {
+        id: "",
+        name: "Python Programming",
+
+        time: {
+            day: "Wednesday",
+            start: "08:00",
+            over: "10:00"
+        },
+
+        type: "course",
+
+        location: "Nyarady",
+
+        location_url: "https://maps.app.goo.gl/B2DfdXcXAAPiCUGy7",
+
+        comment: "Botanical Garden, 2nd floor, at the end of the corridor"
+    },
 
     {
         id: "",
-        name: "Algorithmic thinking",
+        name: "Python Programming",
 
         time: {
-            day: "Friday",
-            start: "18:00",
-            over: "20:00"
+            day: "Wednesday",
+            start: "14:00",
+            over: "16:00"
         },
 
         type: "seminar",
+
+        location: "L.A.V",
+
+        location_url: "https://maps.app.goo.gl/sopcXcY97QSzdKaN9",
+
+        comment: "Miko garden, 1b entrance, 3rd floor"
+    }
+
+];
+
+/*
+{
+        id: "",
+        name: "",
+
+        time: {
+            day: "",
+            start: "",
+            over: ""
+        },
+
+        type: "",
 
         location: "",
 
         location_url: "",
 
         comment: ""
-    }
-
-];
+}
+*/
